@@ -22,7 +22,8 @@
     "strictPropertyInitialization": false,
     "typeRoots": [
       "./node_modules/@types"
-    ]
+    ],
+    "outDir": "./dir" // leftalwasy dot first './dist'
   },
   "exclude": [
     "node_modules",
