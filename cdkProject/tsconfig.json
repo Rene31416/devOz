@@ -23,10 +23,14 @@
     "typeRoots": [
       "./node_modules/@types"
     ],
-    "outDir": "./dir" // leftalwasy dot first './dist'
+    "outDir": "./dir", // leftalwasy dot first './dist'
+    "rootDir": "./src",
+    "esModuleInterop": true,
+    
   },
   "exclude": [
     "node_modules",
     "cdk.out"
-  ]
+  ],
+  "include": ["src/**/*.ts"]
 }
