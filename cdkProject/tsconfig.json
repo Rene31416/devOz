@@ -20,12 +20,20 @@
     "inlineSources": true,
     "experimentalDecorators": true,
     "strictPropertyInitialization": false,
+    "moduleResolution":"node",
     "typeRoots": [
       "./node_modules/@types"
     ],
     "outDir": "./dir", // leftalwasy dot first './dist'
     "rootDir": "./src",
     "esModuleInterop": true,
+    "emitDecoratorMetadata":true,
+    "baseUrl":".",
+    "paths": {
+      "*": [
+          "node_modules/*"
+      ]
+  }
     
   },
   "exclude": [

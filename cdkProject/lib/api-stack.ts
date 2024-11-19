@@ -1,20 +1,25 @@
-import * as cdk from 'aws-cdk-lib'
-import { Construct } from 'constructs';
-import * as apigw from 'aws-cdk-lib/aws-apigateway'
+import * as cdk from "aws-cdk-lib";
+import { Construct } from "constructs";
+import * as apigw from "aws-cdk-lib/aws-apigateway";
+import * as lambda from "aws-cdk-lib/aws-lambda";
 
+export class apiStack extends cdk.Stack {
+  constructor(scope: Construct, id: string, props: cdk.StackProps) {
+    super(scope, id, props);
 
-export class apiStack extends cdk.Stack{
+    const restApi = new apigw.RestApi(this, "restApi");
 
-    constructor(scope:Construct, id: string, props: cdk.StackProps){
-        super(scope, id, props)
+    //pibeApi.root.addMethod('pibe')
 
-        const pibeApi = new apigw.RestApi(this,'pibeApi')
+    const resource = restApi.root.addResource("projects");
 
-        //pibeApi.root.addMethod('pibe')
+    const lambdaArn = cdk.Fn.importValue("controllerLambdaArn");
 
-        const resource = pibeApi.root.addResource('pibe')
-        resource.addMethod('GET')
+    const LambdaIntegration = new apigw.LambdaIntegration(
+      lambda.Function.fromFunctionArn(this, "integrationLambda", lambdaArn)
+    );
 
-
-    }
+    console.log(`ControllerLambda imported succesfully: ${lambdaArn}`);
+    resource.addMethod("GET");
+  }
 }
