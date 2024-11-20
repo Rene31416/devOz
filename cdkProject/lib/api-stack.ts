@@ -11,15 +11,13 @@ export class apiStack extends cdk.Stack {
 
     //pibeApi.root.addMethod('pibe')
 
-    const resource = restApi.root.addResource("projects");
+    const resource = restApi.root.addResource("devOpz");
 
-    const lambdaArn = cdk.Fn.importValue("controllerLambdaArn");
+    const routingLambdaArn = cdk.Fn.importValue("routingLambdaArn");
 
     const LambdaIntegration = new apigw.LambdaIntegration(
-      lambda.Function.fromFunctionArn(this, "integrationLambda", lambdaArn)
+      lambda.Function.fromFunctionArn(this, "integrationLambda", routingLambdaArn)
     );
 
-    console.log(`ControllerLambda imported succesfully: ${lambdaArn}`);
-    resource.addMethod("GET");
   }
 }

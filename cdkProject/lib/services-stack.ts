@@ -1,4 +1,5 @@
 import * as cdk from "aws-cdk-lib";
+import { ApiDefinition } from "aws-cdk-lib/aws-apigateway";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import { Construct } from "constructs";
 import * as path from "path";
@@ -14,6 +15,19 @@ export class servicesStack extends cdk.Stack {
       handler: "pibeLambda.pibeLambda", // ('name of file', 'name of function')
       code: lambda.Code.fromAsset(path.join(__dirname, "../dir/")), //directory of thesource code (ts case js files)
     });
+
+    const routingLambda = new lambda.Function(this, 'routingLambda',{
+      runtime:lambda.Runtime.NODEJS_18_X,
+      handler:'api.handler',
+      code: lambda.Code.fromAsset(path.join(__dirname, "../dir/")), //directory of thesource code (ts case js files)
+
+    })
+
+    const routingLambdaArn = new cdk.CfnOutput(this, "routingLambdaArn", {
+      value: routingLambda.functionArn,
+      exportName: "routingLambdaArn",
+    });
+
     const pibeFunctionArn = new cdk.CfnOutput(this, "controllerLambdaArn", {
       value: controllerLambda.functionArn,
       exportName: "controllerLambdaArn",
