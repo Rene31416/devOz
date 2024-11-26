@@ -13,11 +13,11 @@ export class apiStack extends cdk.Stack {
     
     const restApi = new apigw.LambdaRestApi(this, 'routingLambdaItegration', {
       handler: serviceRoutingLambda,
-      proxy:false
+      proxy: true
     }); 
 
-    const devOz = restApi.root.addResource('devOz')
-    devOz.addMethod('ANY')
+    //const devOz = restApi.root.addResource('devOz')
+    //devOz.addMethod('ANY')
     //routing ANY (GET, POST, PUT, DELETE) method to lambda
   }
 }

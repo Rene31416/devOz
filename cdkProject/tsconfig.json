@@ -24,7 +24,7 @@
     "typeRoots": [
       "./node_modules/@types"
     ],
-    "outDir": "./dir", // leftalwasy dot first './dist'
+    "outDir": "./dist", // leftalwasy dot first './dist'
     "rootDir": "./src",
     "esModuleInterop": true,
     "emitDecoratorMetadata":true,
