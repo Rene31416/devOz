@@ -5,8 +5,7 @@
     "cdk_project": "bin/cdk_project.js"
   },
   "scripts": {
-    "build": "esbuild src/api.ts --bundle --platform=node --target=node18 --outfile=dist/api.js && esbuild src/controllers/HelloWorldController.ts --bundle --platform=node --target=node18 --outfile=dist/controllers/HelloWorldController.js && esbuild src/local/local.ts --bundle --platform=node --target=node18 --outfile=dist/local/local.js && esbuild src/container.ts --bundle --platform=node --target=node18 --outfile=dist/container.js",
-    "run:local": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/local/local.ts",
+    "build": "esbuild ./src/**/** --bundle --platform=node --target=node18 --outdir=dist && esbuild ./src/*.ts --bundle --platform=node --target=node18 --outdir=dist",
     "watch": "tsc -w",
     "test": "jest",
     "cdk": "cdk"
@@ -17,6 +16,7 @@
     "aws-cdk": "2.133.0",
     "esbuild": "^0.24.0",
     "jest": "^29.7.0",
+    "lambda-api": "^1.1.0",
     "ts-jest": "^29.1.2",
     "ts-lambda-api-local": "^2.4.0",
     "ts-node": "^10.9.2",
