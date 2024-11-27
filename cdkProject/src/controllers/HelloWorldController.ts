@@ -1,31 +1,29 @@
 import { injectable } from "inversify"
-import { apiController, Controller, GET } from "ts-lambda-api"
-@apiController("/hello-world")
+import { getProject, postProject, putProject } from "../services/projectServices"
+import { apiController, Controller, GET, pathParam, POST, PUT, queryParam } from "ts-lambda-api"
+@apiController("/projects") // api/v1/hello-world for every controller define here
+
 @injectable() // all controller classes must be decorated with injectable
 // extending Controller is optional, it provides convenience methods
 export class HelloWorldController extends Controller {
     // GET, POST, PUT, PATCH and DELETE are supported
-    @GET("")
+    
+    @GET("/")
     public get() {
-        return {
-            "hiBabe": "IloveYouMyPibe"
-        }
+        return getProject()
     }
 
     // sub routes can be specified in method decorators
-    @GET("/sub-resource")
-    public getSubResource() {
-        return {
-            "hello": "world",
-            "sub": "resource"
-        }
+    @POST("/")
+    public post() {
+        return postProject()
     }
+
+    @PUT("/:id")
+    public put( @queryParam('id') id:string) {
+        return putProject(id)
+    }
+        
+
 }
 
-
-const handler = ()=>{
-    console.log('hoalaaaaaaaaa')
-}
-
-handler()
-//cdkProject/src/controllers/HelloWorldController.ts
