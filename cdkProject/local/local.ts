@@ -1,7 +1,7 @@
 import * as path from "path";
 import { AppConfig } from "ts-lambda-api";
 import { ApiConsoleApp } from "ts-lambda-api-local";
-import { container } from "../container"; // Import your container
+import { container } from "../src/container"; // Import your container
 
 // Create API configuration
 const appConfig = new AppConfig();
