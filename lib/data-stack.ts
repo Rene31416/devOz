@@ -13,6 +13,7 @@ export class dataStack extends Stack {
         })
 
         const arnTable: string = projectsTable.tableArn
+        this.tablearn = arnTable
 
     }
 }

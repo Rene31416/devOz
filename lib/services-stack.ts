@@ -38,7 +38,7 @@ export class servicesStack extends cdk.Stack {
           "dynamodb:DeleteItem"
         ],
         resources: [
-          props?.tableArn
+          props.tableArn
         ],
       }
     ))
