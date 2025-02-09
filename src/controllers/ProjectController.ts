@@ -8,8 +8,9 @@ import { apiController, body, Controller, DELETE, GET, pathParam, POST, PUT, que
 export class ProjectController extends Controller {
     // GET, POST, PUT, PATCH and DELETE are supported
 
+
     @GET("/:projectId")
-    public get(@queryParam("projectId") projectId: string) {
+    public get(@pathParam("projectId") projectId: string) {
         return getProject(projectId)
     }
 

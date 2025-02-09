@@ -1,5 +1,5 @@
 import * as path from "path"
-import { container } from "../src/container"
+import { container } from "./container"
 import { AppConfig, ApiLambdaApp } from "ts-lambda-api"
 
 const appConfig = new AppConfig()

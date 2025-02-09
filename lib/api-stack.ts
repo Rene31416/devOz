@@ -5,13 +5,12 @@ import * as lambda from "aws-cdk-lib/aws-lambda";
 import { api } from "ts-lambda-api";
 
 export class apiStack extends cdk.Stack {
-  constructor(scope: Construct, id: string, serviceRoutingLambda: lambda.IFunction, props?: cdk.StackProps) {
+  constructor(scope: Construct, id: string, serviceRoutingLambda: lambda.Function, props?: cdk.StackProps) {
     super(scope, id, props);
     //Declaring api
     //const restApi = new apigw.RestApi(this, "restApi");
 
     //Lambda Integration
-
     const restApi = new apigw.LambdaRestApi(this, 'dev-opz-apigw', {
       handler: serviceRoutingLambda,
       proxy: true,

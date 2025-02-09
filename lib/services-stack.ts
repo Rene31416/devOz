@@ -1,35 +1,34 @@
 import * as cdk from "aws-cdk-lib";
+import { Table, TableV2 } from "aws-cdk-lib/aws-dynamodb";
 import { PolicyStatement } from "aws-cdk-lib/aws-iam";
 import * as lambda from "aws-cdk-lib/aws-lambda";
+import { ILogGroup, LogGroup } from "aws-cdk-lib/aws-logs";
 import { Construct } from "constructs";
 import * as path from "path";
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
 
 interface serviceStackProps extends cdk.StackProps {
-  tableArn: string
+  projectTable: TableV2 
 }
 
 export class servicesStack extends cdk.Stack {
-  public readonly myRoutingLambdaFunction: lambda.IFunction //exporting this class variable so i can pass it to api stack
+  public readonly myRoutingLambdaFunction: lambda.Function //exporting this class variable so i can pass it to api stack
 
   constructor(scope: Construct, id: string, props: serviceStackProps) {
     super(scope, id, props);
-    console.log(`_dirname : ${__dirname}`);
 
-    const controllerLambda = new lambda.Function(this, "controllerLambda", {
-      runtime: lambda.Runtime.NODEJS_18_X,
-      handler: "pibeLambda.pibeLambda", // ('name of file', 'name of function')
-      code: lambda.Code.fromAsset(path.join(__dirname, "../dist/")), //directory of thesource code (ts case js files)
-    });
 
-    const myRoutingLamba = new lambda.Function(this, 'routingLambda', {
+    const routingLambda = new lambda.Function(this, 'routingLambda', {
       runtime: lambda.Runtime.NODEJS_18_X,
+      functionName:'dev-opz-routing-lambda',
       handler: 'api.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, "../dist/")), //directory of thesource code (ts case js files)
-
+      environment:{
+        TABLE_PROJECTS_NAME: props.projectTable.tableName
+      }
     })
 
-    myRoutingLamba.addToRolePolicy(new PolicyStatement(
+    routingLambda.addToRolePolicy(new PolicyStatement(
       {
         actions: [
           "dynamodb:GetItem",
@@ -38,10 +37,13 @@ export class servicesStack extends cdk.Stack {
           "dynamodb:DeleteItem"
         ],
         resources: [
-          props.tableArn
+          props.projectTable.tableArn
         ],
       }
     ))
-    this.myRoutingLambdaFunction = myRoutingLamba
+
+    this.myRoutingLambdaFunction = routingLambda
+
+
   }
 }

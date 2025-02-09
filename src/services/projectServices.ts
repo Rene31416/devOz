@@ -4,9 +4,15 @@ import { DeleteItemCommand, DynamoDBClient, GetItemCommand, PutItemCommand, Upda
 
 // mock response
 //basic crud
-const name = "dataStack-ProjectTableE109554C-8MKI6U1FD0DB"
+const name = process.env.TABLE_PROJECTS_NAME
+//const name = "dataStack-ProjectTableE109554C-8MKI6U1FD0DB"
+
 // gets an especific project
 export const getProject = async (id: string) => {
+    console.log('hi this is the lambda for get controller')
+    console.log(`id ${id}`)
+    console.log(`it will be log in this arn: $name}`)
+    console.log(`hey this is my table name ${name}`)
     const sdk: DynamoDBClient = initSdkClient()
     const itemParams = {
         TableName: name,
@@ -18,9 +24,10 @@ export const getProject = async (id: string) => {
         const command = new GetItemCommand(itemParams)
         const getValue = await sdk.send(command)
         console.log(`Value retrieved ${getValue.Item}`)
+        return getValue.Item
     } catch (e) {
         console.error(e)
-        throw new Error
+        throw new Error('no ID found')
     }
 }
 
