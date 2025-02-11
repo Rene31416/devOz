@@ -9,7 +9,10 @@ const app = new cdk.App();
 
 const deployDataStack = new dataStack(app, 'dataStack')
 
-const deployServiceStack = new servicesStack(app, 'serviceStack', { projectTable: deployDataStack.projectTableCrossAccount});
+const deployServiceStack = new servicesStack(app, 'serviceStack', {
+    tableSsmName:deployDataStack.ssmProjectTableName,
+    arnSsmName: deployDataStack.ssmProjectTableArn
+});
 
 const deplouApiStack = new apiStack(app, 'apiStack', deployServiceStack.myRoutingLambdaFunction)
 
