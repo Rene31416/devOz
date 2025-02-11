@@ -4,12 +4,12 @@ import { DynamoConstruct } from "../interfaces/cdkInterfaces";
 import { Construct } from "constructs";
 import { Stack, RemovalPolicy } from "aws-cdk-lib";
 
-export class dbTable extends Stack {
+export class dbTable extends Construct {
   public readonly ssmTableName: string;
   public readonly ssmTableArn: string;
 
   constructor(scope: Construct, id: string, props: DynamoConstruct) {
-    super(scope, id, props);
+    super(scope, id);
     const ssmParamName = `/table/${props.name}`;
     this.buildDynamoTable(props, ssmParamName);
     this.ssmTableName = `${ssmParamName}-name`;
