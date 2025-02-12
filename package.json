@@ -23,6 +23,7 @@
     "typescript": "~5.3.3"
   },
   "dependencies": {
+    "@aws-lambda-powertools/logger": "^2.13.1",
     "@aws-sdk/client-dynamodb": "^3.699.0",
     "@aws-sdk/client-ssm": "^3.744.0",
     "aws-cdk-lib": "^2.133.0",

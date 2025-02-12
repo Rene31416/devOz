@@ -1,18 +1,17 @@
-import { IprojecInterface } from '../interfaces/projectInterfaces'
 import { DeleteItemCommand, DynamoDBClient, GetItemCommand, PutItemCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb'
+import { Logger } from "@aws-lambda-powertools/logger";
 
+const logger = new Logger({
+  logLevel: "INFO",
+  serviceName: "projectService",
+});
 
-// mock response
-//basic crud
 const name = process.env.TABLE_PROJECTS_NAME
-//const name = "dataStack-ProjectTableE109554C-8MKI6U1FD0DB"
+
 
 // gets an especific project
 export const getProject = async (id: string) => {
-    console.log('hi this is the lambda for get controller')
-    console.log(`id ${id}`)
-    console.log(`it will be log in this arn: $name}`)
-    console.log(`hey this is my table name ${name}`)
+    logger.debug(`GET command to dynamo ${name} id: ${id}`)
     const sdk: DynamoDBClient = initSdkClient()
     const itemParams = {
         TableName: name,
@@ -23,34 +22,46 @@ export const getProject = async (id: string) => {
     try {
         const command = new GetItemCommand(itemParams)
         const getValue = await sdk.send(command)
-        console.log(`Value retrieved ${getValue.Item}`)
-        return getValue.Item
+        logger.debug(`Value retrieved ${getValue.Item}`)
+        return {
+            code: 200,
+            message:`Project with id: ${id} succesfully retrieved`,
+            body: getValue.Item
+        }
     } catch (e) {
-        console.error(e)
-        throw new Error('no ID found')
+        logger.error(`${e}`)
+        return {
+            code: 1001,
+            message:`ERROR - project id ${id} couldn't be retrieved`
+        }
     }
 }
 
 // creates a new project
-export const createProject = async (id: any) => {
-    console.log('printing body', id)
+export const createProject = async (project: any) => {
+    logger.debug(`PUT command to dynamo ${name} for project ${project.id}`)
     const sdk: DynamoDBClient = initSdkClient()
     const params = {
-        TableName: name, // Replace with your table name
+        TableName: name, 
         Item: {
-            id: { S: "12345" },         // Primary key (string type)
-            name: { S: "John Doe" },    // String attribute
-            age: { N: "30" },           // Number attribute
-            isActive: { BOOL: true },   // Boolean attribute
+            id: { S: project.id },         
+            name: { S: project.name},     
         },
     };
     try {
         const command = new PutItemCommand(params)
         const getValue = await sdk.send(command)
-        console.log(`Value inserted succefully`)
+        logger.debug(`Value retrieved ${getValue.Attributes}`)
+        return {
+            code: 200,
+            message:`project with id: ${project.id} succesfully created`
+        }
     } catch (e) {
-        console.error(e)
-        throw new Error
+        logger.error(`${e}`)
+        return {
+            code: 1002,
+            message:`ERROR - project id ${project.id} couldn't be retrieved`
+        }
     }
 }
 //modify an existing project
