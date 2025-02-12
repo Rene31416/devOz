@@ -2,7 +2,20 @@ import { StringParameter } from "aws-cdk-lib/aws-ssm";
 import { TableV2, AttributeType } from "aws-cdk-lib/aws-dynamodb";
 import { DynamoConstruct } from "../interfaces/cdkInterfaces";
 import { Construct } from "constructs";
-import { Stack, RemovalPolicy } from "aws-cdk-lib";
+import { RemovalPolicy } from "aws-cdk-lib";
+  /**
+   * Creates a new DynamoDB table and stores its name and ARN in AWS Systems Manager (SSM) Parameter Store.
+   * 
+   * @param scope - The parent construct in which this construct is created.
+   * @param id - The unique identifier for this construct.
+   * @param props - The properties required to configure the DynamoDB table, including:
+   *   - `name`: The name of the table.
+   *   - `partitionName`: The name of the partition key.
+   * 
+   * This constructor initializes the table and stores its metadata in SSM parameters:
+   * - The table name is stored under `/table/{name}-name`.
+   * - The table ARN is stored under `/table/{name}-arn`.
+   */
 
 export class dbTable extends Construct {
   public readonly ssmTableName: string;
