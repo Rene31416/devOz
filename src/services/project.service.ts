@@ -16,7 +16,7 @@ import { Logger } from "@aws-lambda-powertools/logger";
 import { Command, ItemParams } from "../interfaces/projectInterfaces";
 
 @injectable()
-export class project {
+export class Project {
   private readonly tableName = process.env.TABLE_PROJECTS_NAME || "";
   private readonly dynamoClient = new DynamoDBClient({ region: "us-east-1" });
   private docClient: DynamoDBDocumentClient;
@@ -28,19 +28,14 @@ export class project {
   ) {
     this.dynamoClient = client;
     this.docClient = DynamoDBDocumentClient.from(client);
-  } // @inject(new LazyServiceIdentifier(()=> Logger))
-  // private logger: Logger,
-  // @inject(new LazyServiceIdentifier(() => DynamoDBClient))
-  // private dynamoClient: DynamoDBClient,
-  // @inject(new LazyServiceIdentifier(() => DynamoDBDocumentClient))
-  // private dynamoDBDocumentClient: DynamoDBDocumentClient
+  } 
 
   public async getProject(id: string) {
     this.logger.debug(`GET command to dynamo ${this.tableName} id: ${id}`);
     const itemParams: ItemParams = {
       TableName: this.tableName,
       Key: {
-        id, // Key of the item to retrieve
+        id,
       },
     };
     return this.dynamoDb(Command.Get, itemParams);
