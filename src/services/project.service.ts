@@ -42,11 +42,10 @@ export class Project {
     return this.dynamoDb(Command.Get, itemParams);
   }
   public async postProject(body: Record<any, any>) {
-    const project = this.validateBody(body);
     const params = {
       TableName: this.tableName,
       Item: {
-        project,
+        body,
       },
     };
     this.dynamoDb(Command.Put, params);
@@ -62,21 +61,6 @@ export class Project {
     return this.dynamoDb(Command.Delete, params)
   }
 
-  private validateBody(body: Record<any, any>): {
-    id: string;
-    name: string;
-    description: string;
-  } {
-    if (body.name && body.id && body.description) {
-      return {
-        name: body.name,
-        id: body.id,
-        description: body.description,
-      };
-    } else {
-      throw Error("Not ID NAME or DESCRIPTION included in request body");
-    }
-  }
 
   private async dynamoDb(operation: Command, itemParams: ItemParams) {
     try {
