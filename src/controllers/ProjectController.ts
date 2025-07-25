@@ -1,10 +1,11 @@
-import { injectable } from "inversify";
+import { inject, injectable, LazyServiceIdentifier } from "inversify";
 import {
   getProject,
   createProject,
   modifyProject,
   deleteProject,
 } from "../services/projectServices";
+import {Project} from '../services/project.service'
 import {
   apiController,
   body,
@@ -19,26 +20,32 @@ import {
 @injectable() // all controller classes must be decorated with injectable
 // extending Controller is optional, it provides convenience methods
 export class ProjectController extends Controller {
+  constructor(
+    @inject(new LazyServiceIdentifier( ()=>Project) )
+    private readonly project : Project
+  ){
+    super()
+  }
   // GET, POST, PUT, PATCH and DELETE are supported
 
   @GET("/:projectId")
   public get(@pathParam("projectId") projectId: string) {
-    return getProject(projectId);
+    return this.project.getProject(projectId);
   }
 
   // sub routes can be specified in method decorators
   @POST("/create")
   public post(@body projectId: Record<string, string>) {
-    return createProject(projectId);
+    return this.project.postProject(projectId);
   }
 
   @PUT("/update")
   public put(@body projectId: Record<string, string>) {
-    return modifyProject(projectId);
+    return this.project.postProject(projectId);
   }
 
   @DELETE("/:projectId")
   public delete(@pathParam("projectId") projectId: string) {
-    return deleteProject(projectId);
+    return this.project.deleteProject(projectId);
   }
 }
