@@ -26,14 +26,12 @@ export class ProjectController extends Controller {
   ){
     super()
   }
-  // GET, POST, PUT, PATCH and DELETE are supported
 
   @GET("/:projectId")
   public get(@pathParam("projectId") projectId: string) {
     return this.project.getProject(projectId);
   }
 
-  // sub routes can be specified in method decorators
   @POST("/create")
   public post(@body projectId: Record<string, string>) {
     return this.project.postProject(projectId);
