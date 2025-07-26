@@ -18,7 +18,7 @@ import {validate} from "class-validator";
 // extending Controller is optional, it provides convenience methods
 export class ProjectController extends Controller {
   constructor(
-    @inject(new LazyServiceIdentifier( ()=>Project) )
+    @inject(Project )
     private readonly project : Project
   ){
     super()
