@@ -1,5 +1,5 @@
 import { Container } from "inversify";
-import { ProjectController } from "./controllers/ProjectController";
+import { ProjectController } from "./controllers/project.controller";
 
 // Create the Inversify container
 const container = new Container();
