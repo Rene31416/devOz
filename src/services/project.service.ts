@@ -2,7 +2,7 @@ import {
   inject,
   injectable,
   LazyServiceIdentifier,
-} from "inversify/lib/cjs";
+} from "inversify";
 import {
   DynamoDBClient,
 } from "@aws-sdk/client-dynamodb";
@@ -19,16 +19,14 @@ import { Command, ItemParams } from "../interfaces/projectInterfaces";
 @injectable()
 export class Project {
   private readonly tableName = process.env.TABLE_PROJECTS_NAME || "";
-  private readonly dynamoClient = new DynamoDBClient({ region: "us-east-1" });
+  private readonly client = new DynamoDBClient({ region: "ca-central-1" });
   private docClient: DynamoDBDocumentClient;
 
   constructor(
-    client: DynamoDBClient,
-    @inject(new LazyServiceIdentifier(() => Logger))
-    private logger: Logger
+    @inject(Logger)
+    private logger: Logger,
   ) {
-    this.dynamoClient = client;
-    this.docClient = DynamoDBDocumentClient.from(client);
+    this.docClient = DynamoDBDocumentClient.from(this.client);
   } 
 
   public async getProject(id: string) {
@@ -48,7 +46,7 @@ export class Project {
         body,
       },
     };
-    this.dynamoDb(Command.Put, params);
+    return this.dynamoDb(Command.Put, params);
   }
 
   public async deleteProject(id: string){
