@@ -12,7 +12,7 @@ export class dataStack extends Stack {
 
     const projectsTable = new dbTable(this, id, {
         name:'devOpz-table',
-        partitionName:'id'
+        partitionName:'id',
     })
 
     this.ssmProjectTableName = projectsTable.ssmTableName

@@ -43,7 +43,7 @@ export class Project {
     const params = {
       TableName: this.tableName,
       Item: {
-        body,
+        ...body,
       },
     };
     return this.dynamoDb(Command.Put, params);

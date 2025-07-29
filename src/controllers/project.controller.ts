@@ -12,7 +12,8 @@ import {
 } from "ts-lambda-api";
 import { plainToInstance } from "class-transformer";
 import { ProjectDTO } from "../dto/projects.dtos";
-import { validate } from "class-validator";
+import { validate, validateOrReject } from "class-validator";
+import { error } from "console";
 @apiController("/projects") // api/v1/hello-world for every controller define here
 @injectable() // all controller classes must be decorated with injectable
 // extending Controller is optional, it provides convenience methods
@@ -36,7 +37,7 @@ export class ProjectController extends Controller {
 
   @POST("/create")
   public async post(@body project: Record<string, string>) {
-    //await this.ValidateDTO(project, ProjectDTO);
+    await this.ValidateDTO(project, ProjectDTO);
     return this.project.postProject(project);
   }
 
@@ -52,10 +53,14 @@ export class ProjectController extends Controller {
   }
 
   public async ValidateDTO(body: Record<string, string>, bodyDTO: any) {
-    const dto: Record<string, string> = plainToInstance(bodyDTO, body);
-    const error = await validate(dto);
-    if (error.length) {
-      throw Error(`Error in body validation ${error}`);
+    try {
+      const dto: Record<string, string> = plainToInstance(bodyDTO, body);
+      const errors = await validate(dto);
+      if(errors.length>0){
+        throw errors
+      }
+    } catch (error) {
+      throw Error(`Unexpected Error validating body ${JSON.stringify(error)}`);
     }
   }
 }
