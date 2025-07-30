@@ -39,7 +39,7 @@ export class ProjectController extends Controller {
   @PUT("/update")
   public async put(@body project: Record<string, string>) {
     await this.ValidateDTO(project, ProjectDTO);
-    return this.project.postProject(project);
+    return this.project.putProject(project);
   }
 
   @DELETE("/:projectId")

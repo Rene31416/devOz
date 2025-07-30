@@ -8,6 +8,7 @@ export enum Command {
   Delete,
   Get,
   Put,
+  Post
 }
 
 export interface ItemParams{

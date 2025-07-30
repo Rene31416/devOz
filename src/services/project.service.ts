@@ -1,11 +1,5 @@
-import {
-  inject,
-  injectable,
-  LazyServiceIdentifier,
-} from "inversify";
-import {
-  DynamoDBClient,
-} from "@aws-sdk/client-dynamodb";
+import { inject, injectable, LazyServiceIdentifier } from "inversify";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 
 import {
   DeleteCommand,
@@ -24,10 +18,10 @@ export class Project {
 
   constructor(
     @inject(Logger)
-    private logger: Logger,
+    private logger: Logger
   ) {
     this.docClient = DynamoDBDocumentClient.from(this.client);
-  } 
+  }
 
   public async getProject(id: string) {
     const itemParams: ItemParams = {
@@ -39,7 +33,17 @@ export class Project {
     return this.dynamoDb(Command.Get, itemParams);
   }
   public async postProject(body: Record<any, any>) {
-    const params = {
+    const params: ItemParams = {
+      TableName: this.tableName,
+      Item: {
+        ...body,
+      },
+    };
+    return this.dynamoDb(Command.Post, params);
+  }
+
+  public async putProject(body: Record<any, any>) {
+    const params: ItemParams = {
       TableName: this.tableName,
       Item: {
         ...body,
@@ -48,17 +52,15 @@ export class Project {
     return this.dynamoDb(Command.Put, params);
   }
 
-  public async deleteProject(id: string){
-    const params = {
-        TableName: this.tableName,
-        Key: {
-            id,
-        }
-    }
-    console.log(JSON.stringify(params))
-    return this.dynamoDb(Command.Delete, params)
+  public async deleteProject(id: string) {
+    const params: ItemParams = {
+      TableName: this.tableName,
+      Key: {
+        id,
+      },
+    };
+    return this.dynamoDb(Command.Delete, params);
   }
-
 
   private async dynamoDb(operation: Command, itemParams: ItemParams) {
     try {
@@ -70,6 +72,15 @@ export class Project {
               Key: itemParams.Key,
             })
           );
+        case Command.Post:
+          return await this.docClient.send(
+            new PutCommand({
+              TableName: this.tableName,
+              Item: itemParams.Item,
+              ConditionExpression: "attribute_not_exists(id)",
+            })
+          );
+
         case Command.Put:
           return await this.docClient.send(
             new PutCommand({
@@ -85,7 +96,9 @@ export class Project {
             })
           );
       }
-    } catch (error) {
+    } catch (error: any) {
+      if (error.name === "ConditionalCheckFailedException")
+        return { statuCode: 201, Mesage: "Item already exists" };
       this.logger.error(`Unexpected Error in dynamoDb operation`);
       this.logger.error(JSON.stringify({ error }));
       throw error;
