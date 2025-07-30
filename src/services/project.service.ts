@@ -5,10 +5,12 @@ import {
   DeleteCommand,
   DynamoDBDocumentClient,
   GetCommand,
+  GetCommandOutput,
   PutCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { Logger } from "@aws-lambda-powertools/logger";
-import { Command, ItemParams } from "../interfaces/projectInterfaces";
+import { Command, IApiResponse, ItemParams, MyItem, ResponseMessage, StatusCode } from "../interfaces/projectInterfaces";
+import { Result } from "aws-cdk-lib/aws-stepfunctions";
 
 @injectable()
 export class Project {
@@ -23,14 +25,25 @@ export class Project {
     this.docClient = DynamoDBDocumentClient.from(this.client);
   }
 
-  public async getProject(id: string) {
+  public async getProject(id: string) : Promise<IApiResponse>{
+    try{
     const itemParams: ItemParams = {
       TableName: this.tableName,
       Key: {
         id,
       },
     };
-    return this.dynamoDb(Command.Get, itemParams);
+    const response: GetCommandOutput = await this.dynamoDb(Command.Get, itemParams);
+
+    return {
+      statusCode: StatusCode.Sucess,
+      message: ResponseMessage.GeneralSucces,
+      data: response.Item 
+    }
+    } catch (error){
+
+    }
+    
   }
   public async postProject(body: Record<any, any>) {
     const params: ItemParams = {
@@ -39,7 +52,10 @@ export class Project {
         ...body,
       },
     };
-    return this.dynamoDb(Command.Post, params);
+    const response = await this.dynamoDb(Command.Post, params);
+    return {
+      statusCode: 200
+    }
   }
 
   public async putProject(body: Record<any, any>) {
@@ -49,7 +65,7 @@ export class Project {
         ...body,
       },
     };
-    return this.dynamoDb(Command.Put, params);
+    const response = await  this.dynamoDb(Command.Put, params);
   }
 
   public async deleteProject(id: string) {
@@ -59,7 +75,7 @@ export class Project {
         id,
       },
     };
-    return this.dynamoDb(Command.Delete, params);
+    const response = await  this.dynamoDb(Command.Delete, params);
   }
 
   private async dynamoDb(operation: Command, itemParams: ItemParams) {
