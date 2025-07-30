@@ -30,11 +30,6 @@ export class ProjectController extends Controller {
     return this.project.getProject(projectId);
   }
 
-  @GET("/test")
-  public geTest() {
-    return "Returning something";
-  }
-
   @POST("/create")
   public async post(@body project: Record<string, string>) {
     await this.ValidateDTO(project, ProjectDTO);

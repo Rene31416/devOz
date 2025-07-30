@@ -30,7 +30,6 @@ export class Project {
   } 
 
   public async getProject(id: string) {
-    this.logger.debug(`GET command to dynamo ${this.tableName} id: ${id}`);
     const itemParams: ItemParams = {
       TableName: this.tableName,
       Key: {
@@ -52,10 +51,11 @@ export class Project {
   public async deleteProject(id: string){
     const params = {
         TableName: this.tableName,
-        key: {
-            id
+        Key: {
+            id,
         }
     }
+    console.log(JSON.stringify(params))
     return this.dynamoDb(Command.Delete, params)
   }
 
