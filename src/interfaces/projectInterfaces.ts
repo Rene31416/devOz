@@ -43,7 +43,7 @@ export enum StatusCode{
 }
 
 export enum ResponseMessage {
-  GeneralSucces ='Successful API response'
+  GeneralSuccess ='Successful API response'
 }
 /**
  * CONSTANTS

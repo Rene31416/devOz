@@ -29,6 +29,10 @@ export class ProjectController extends Controller {
   public get(@pathParam("projectId") projectId: string) {
     return this.project.getProject(projectId);
   }
+  @GET("/list")
+  public getList() {
+    return this.project.getAllList();
+  }
 
   @POST("/create")
   public async post(@body project: Record<string, string>) {
