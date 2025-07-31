@@ -1,16 +1,19 @@
-import { inject, injectable, LazyServiceIdentifier } from "inversify";
+import { inject, injectable } from "inversify";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 
 import {
   DeleteCommand,
   DynamoDBDocumentClient,
   GetCommand,
-  GetCommandOutput,
   PutCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { Logger } from "@aws-lambda-powertools/logger";
-import { Command, IApiResponse, ItemParams, MyItem, ResponseMessage, StatusCode } from "../interfaces/projectInterfaces";
-import { Result } from "aws-cdk-lib/aws-stepfunctions";
+import {
+  GenericError,
+  IApiResponse,
+  ResponseMessage,
+  StatusCode,
+} from "../interfaces/projectInterfaces";
 
 @injectable()
 export class Project {
@@ -25,99 +28,87 @@ export class Project {
     this.docClient = DynamoDBDocumentClient.from(this.client);
   }
 
-  public async getProject(id: string) : Promise<IApiResponse>{
-    try{
-    const itemParams: ItemParams = {
-      TableName: this.tableName,
-      Key: {
-        id,
-      },
-    };
-    const response: GetCommandOutput = await this.dynamoDb(Command.Get, itemParams);
-
-    return {
-      statusCode: StatusCode.Sucess,
-      message: ResponseMessage.GeneralSucces,
-      data: response.Item 
-    }
-    } catch (error){
-
-    }
-    
-  }
-  public async postProject(body: Record<any, any>) {
-    const params: ItemParams = {
-      TableName: this.tableName,
-      Item: {
-        ...body,
-      },
-    };
-    const response = await this.dynamoDb(Command.Post, params);
-    return {
-      statusCode: 200
-    }
-  }
-
-  public async putProject(body: Record<any, any>) {
-    const params: ItemParams = {
-      TableName: this.tableName,
-      Item: {
-        ...body,
-      },
-    };
-    const response = await  this.dynamoDb(Command.Put, params);
-  }
-
-  public async deleteProject(id: string) {
-    const params: ItemParams = {
-      TableName: this.tableName,
-      Key: {
-        id,
-      },
-    };
-    const response = await  this.dynamoDb(Command.Delete, params);
-  }
-
-  private async dynamoDb(operation: Command, itemParams: ItemParams) {
+  public async getProject(id: string): Promise<IApiResponse> {
     try {
-      switch (operation) {
-        case Command.Get:
-          return await this.docClient.send(
-            new GetCommand({
-              TableName: this.tableName,
-              Key: itemParams.Key,
-            })
-          );
-        case Command.Post:
-          return await this.docClient.send(
-            new PutCommand({
-              TableName: this.tableName,
-              Item: itemParams.Item,
-              ConditionExpression: "attribute_not_exists(id)",
-            })
-          );
+      const itemParams = {
+        TableName: this.tableName,
+        Key: {
+          id,
+        },
+      };
 
-        case Command.Put:
-          return await this.docClient.send(
-            new PutCommand({
-              TableName: this.tableName,
-              Item: itemParams.Item,
-            })
-          );
-        case Command.Delete:
-          return await this.docClient.send(
-            new DeleteCommand({
-              TableName: this.tableName,
-              Key: itemParams.Key,
-            })
-          );
-      }
+      const response = await this.docClient.send(new GetCommand(itemParams));
+      return {
+        statusCode: StatusCode.Sucess,
+        message: ResponseMessage.GeneralSucces,
+        data: response.Item || [],
+      };
+    } catch (error: any) {
+      this.logger.error("Unexpected Error", { error });
+      return GenericError;
+    }
+  }
+
+  public async postProject(body: Record<any, any>): Promise<IApiResponse> {
+    try {
+      const params = {
+        TableName: this.tableName,
+        Item: {
+          ...body,
+        },
+        ConditionExpression: "attribute_not_exists(id)",
+      };
+      await this.docClient.send(new PutCommand(params));
+
+      return {
+        statusCode: 200,
+        message: ResponseMessage.GeneralSucces,
+      };
     } catch (error: any) {
       if (error.name === "ConditionalCheckFailedException")
-        return { statuCode: 201, Mesage: "Item already exists" };
-      this.logger.error(`Unexpected Error in dynamoDb operation`);
-      this.logger.error(JSON.stringify({ error }));
-      throw error;
+        return { statusCode: 201, message: "Item already exists" };
+      this.logger.error("Unexpected Error", { error });
+      return GenericError;
     }
   }
+
+  public async putProject(body: Record<any, any>): Promise<IApiResponse> {
+    try {
+      const params = {
+        TableName: this.tableName,
+        Item: {
+          ...body,
+        },
+      };
+      this.docClient.send(new PutCommand(params));
+      return {
+        statusCode: 200,
+        message: ResponseMessage.GeneralSucces,
+      };
+    } catch (error: any) {
+      this.logger.error("Unexpected Error", { error });
+      return GenericError;
+    }
+  }
+
+  public async deleteProject(id: string): Promise<IApiResponse> {
+    try {
+      const params = {
+        TableName: this.tableName,
+        Key: {
+          id,
+        },
+      };
+      await this.docClient.send(new DeleteCommand(params));
+
+      return {
+        statusCode: 200,
+        message: ResponseMessage.GeneralSucces,
+      };
+    } catch (error: any) {
+      this.logger.error("Unexpected Error", { error });
+      return GenericError;
+    }
+  }
+
 }
