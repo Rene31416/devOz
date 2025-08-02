@@ -12,8 +12,8 @@ export class dataStack extends Stack {
 
     const projectsTable = new dbTable(this, id, {
         name:'devOpz-table',
-        partitionName:'id',
-    })
+        partitionName:'name'
+      })
 
     this.ssmProjectTableName = projectsTable.ssmTableName
     this.ssmProjectTableArn =projectsTable.ssmTableArn

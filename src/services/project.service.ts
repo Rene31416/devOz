@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-
+import {v4 as uuidv4} from 'uuid'
 import {
   DeleteCommand,
   DynamoDBDocumentClient,
@@ -76,8 +76,9 @@ export class Project {
         TableName: this.tableName,
         Item: {
           ...body,
+          id:uuidv4()
         },
-        ConditionExpression: "attribute_not_exists(id)",
+        ConditionExpression: "attribute_not_exists(name)",
       };
       await this.docClient.send(new PutCommand(params));
 
