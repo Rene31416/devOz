@@ -38,10 +38,12 @@ export class servicesStack extends cdk.Stack{
           "dynamodb:PutItem",
           "dynamodb:UpdateItem",
           "dynamodb:DeleteItem",
-          "dynamodb:Scan"
+          "dynamodb:Scan",
+          "dynamodb:Query"
         ],
         resources: [
-          projectsTableArn
+          projectsTableArn,
+          `${projectsTableArn}/index/tableGsi` //TODO: Use dynamic reference
         ],
       }
     ))

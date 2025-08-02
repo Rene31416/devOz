@@ -1,12 +1,12 @@
 import { inject, injectable } from "inversify";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import {v4 as uuidv4} from 'uuid'
+import { v4 as uuidv4 } from "uuid";
 import {
   DeleteCommand,
   DynamoDBDocumentClient,
-  GetCommand,
+  QueryCommand,
   PutCommand,
-  ScanCommand
+  ScanCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { Logger } from "@aws-lambda-powertools/logger";
 import {
@@ -53,16 +53,18 @@ export class Project {
     try {
       const itemParams = {
         TableName: this.tableName,
-        Key: {
-          id,
+        IndexName:'tableGsi',
+        KeyConditionExpression: "id = :pk",
+        ExpressionAttributeValues: {
+          ":pk": id,
         },
       };
 
-      const response = await this.docClient.send(new GetCommand(itemParams));
+      const response = await this.docClient.send(new QueryCommand(itemParams));
       return {
         statusCode: StatusCode.Sucess,
         message: ResponseMessage.GeneralSuccess,
-        data: response.Item || [],
+        data: response.Items || [],
       };
     } catch (error: any) {
       this.logger.error("Unexpected Error", { error });
@@ -76,9 +78,12 @@ export class Project {
         TableName: this.tableName,
         Item: {
           ...body,
-          id:uuidv4()
+          id: uuidv4(),
         },
-        ConditionExpression: "attribute_not_exists(name)",
+        ConditionExpression: "attribute_not_exists(#name)",
+        ExpressionAttributeNames: {
+          "#name": "name",
+        },
       };
       await this.docClient.send(new PutCommand(params));
 
