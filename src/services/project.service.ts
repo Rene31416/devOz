@@ -93,7 +93,7 @@ export class Project {
       };
     } catch (error: any) {
       if (error.name === "ConditionalCheckFailedException")
-        return { statusCode: 201, message: "Item already exists" };
+        return { statusCode: 201, message: "Item already exists []" };
       this.logger.error("Unexpected Error", { error });
       return GenericError;
     }
