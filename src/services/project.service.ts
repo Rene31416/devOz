@@ -117,7 +117,7 @@ export class Project {
         UpdateExpression: "SET #name = :name, #description = :description",
         ExpressionAttributeNames: {
           "#name": "name",
-          "#description": "description"
+          "#description": "description",
         },
         ExpressionAttributeValues: {
           ":name": body.name,
@@ -137,13 +137,30 @@ export class Project {
 
   public async deleteProject(id: string): Promise<IApiResponse> {
     try {
-      const params = {
+      //query for ID gsi to find pk (#name)
+      const deleteQueryParams = {
         TableName: this.tableName,
-        Key: {
-          id,
+        IndexName: "tableGsi",
+        KeyConditionExpression: "id = :pk",
+        ExpressionAttributeValues: {
+          ":pk": id,
         },
       };
-      await this.docClient.send(new DeleteCommand(params));
+      const queryResponse = await this.docClient.send(
+        new QueryCommand(deleteQueryParams)
+      );
+      //delete all record under pk (should be unique)
+      for (const item of queryResponse.Items ?? []) {
+        console.log(item)
+        const pk = item.name; 
+        const params = {
+          TableName: this.tableName,
+          Key: {
+            name: pk,
+          },
+        };
+        await this.docClient.send(new DeleteCommand(params));
+      }
 
       return {
         statusCode: 200,

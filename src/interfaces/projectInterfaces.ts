@@ -45,6 +45,7 @@ export enum StatusCode{
 
 export enum ResponseMessage {
   GeneralSuccess ='Successful API response',
+  DeleteSuccess = 'Item delete success',
   NoItemsFound = 'No items found'
 }
 /**
