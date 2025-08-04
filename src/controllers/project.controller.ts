@@ -12,8 +12,7 @@ import {
 } from "ts-lambda-api";
 import { plainToInstance } from "class-transformer";
 import { ProjectDTO } from "../dto/projects.dtos";
-import { validate, validateOrReject } from "class-validator";
-import { error } from "console";
+import { validate } from "class-validator";
 @apiController("/projects") // api/v1/hello-world for every controller define here
 @injectable() // all controller classes must be decorated with injectable
 // extending Controller is optional, it provides convenience methods

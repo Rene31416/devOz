@@ -7,6 +7,7 @@ import {
   QueryCommand,
   PutCommand,
   ScanCommand,
+  UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { Logger } from "@aws-lambda-powertools/logger";
 import {
@@ -53,7 +54,7 @@ export class Project {
     try {
       const itemParams = {
         TableName: this.tableName,
-        IndexName:'tableGsi',
+        IndexName: "tableGsi",
         KeyConditionExpression: "id = :pk",
         ExpressionAttributeValues: {
           ":pk": id,
@@ -61,6 +62,13 @@ export class Project {
       };
 
       const response = await this.docClient.send(new QueryCommand(itemParams));
+      if (response.Items?.length === 0) {
+        return {
+          statusCode: StatusCode.PartialSucess,
+          message: ResponseMessage.NoItemsFound,
+          data: [],
+        };
+      }
       return {
         statusCode: StatusCode.Sucess,
         message: ResponseMessage.GeneralSuccess,
@@ -103,11 +111,20 @@ export class Project {
     try {
       const params = {
         TableName: this.tableName,
-        Item: {
-          ...body,
+        Key: {
+          pk: "name", // Your partition key
         },
+        UpdateExpression: "SET #name = :name, #description = :description",
+        ExpressionAttributeNames: {
+          "#name": "name",
+          "#description": "description"
+        },
+        ExpressionAttributeValues: {
+          ":name": body.name,
+          ":description": body.description,
+        }, // Optional: returns only updated fields
       };
-      this.docClient.send(new PutCommand(params));
+      this.docClient.send(new UpdateCommand(params));
       return {
         statusCode: 200,
         message: ResponseMessage.GeneralSuccess,

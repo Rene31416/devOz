@@ -39,11 +39,13 @@ export enum Command {
 }
 
 export enum StatusCode{
-  Sucess = 200
+  Sucess = 200,
+  PartialSucess = 202
 }
 
 export enum ResponseMessage {
-  GeneralSuccess ='Successful API response'
+  GeneralSuccess ='Successful API response',
+  NoItemsFound = 'No items found'
 }
 /**
  * CONSTANTS
