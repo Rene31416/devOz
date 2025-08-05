@@ -22,7 +22,7 @@ export class servicesStack extends cdk.Stack{
 
 
     const routingLambda = new lambda.Function(this, 'routingLambda', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       functionName:'dev-opz-routing-lambda',
       handler: 'api.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, "../dist/")),

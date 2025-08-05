@@ -112,7 +112,7 @@ export class Project {
       const params = {
         TableName: this.tableName,
         Key: {
-          pk: "name", // Your partition key
+          name: body.name, // Your partition key
         },
         UpdateExpression: "SET #name = :name, #description = :description",
         ExpressionAttributeNames: {
@@ -124,7 +124,8 @@ export class Project {
           ":description": body.description,
         }, // Optional: returns only updated fields
       };
-      this.docClient.send(new UpdateCommand(params));
+      console.log(params)
+      await this.docClient.send(new UpdateCommand(params));
       return {
         statusCode: 200,
         message: ResponseMessage.GeneralSuccess,

@@ -25,29 +25,29 @@ export class ProjectController extends Controller {
   }
 
   @GET("/:projectId")
-  public get(@pathParam("projectId") projectId: string) {
-    return this.project.getProject(projectId);
+  public async get(@pathParam("projectId") projectId: string) {
+    return await this.project.getProject(projectId);
   }
   @GET("/list")
-  public getList() {
-    return this.project.getAllList();
+  public async getList() {
+    return await this.project.getAllList();
   }
 
   @POST("/create")
   public async post(@body project: Record<string, string>) {
     await this.ValidateDTO(project, ProjectDTO);
-    return this.project.postProject(project);
+    return await this.project.postProject(project);
   }
 
   @PUT("/update")
   public async put(@body project: Record<string, string>) {
     await this.ValidateDTO(project, ProjectDTO);
-    return this.project.putProject(project);
+    return await this.project.putProject(project);
   }
 
   @DELETE("/:projectId")
-  public delete(@pathParam("projectId") projectId: string) {
-    return this.project.deleteProject(projectId);
+  public async delete(@pathParam("projectId") projectId: string) {
+    return await this.project.deleteProject(projectId);
   }
 
   public async ValidateDTO(body: Record<string, string>, bodyDTO: any) {
