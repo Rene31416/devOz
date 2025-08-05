@@ -4,11 +4,13 @@ import * as lambda from "aws-cdk-lib/aws-lambda";
 import { Construct } from "constructs";
 import * as path from "path";
 import {StringParameter} from 'aws-cdk-lib/aws-ssm'
+import * as kms from "aws-cdk-lib/aws-kms";
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
 
 interface serviceStackProps extends cdk.StackProps {
   tableSsmName: string;
   arnSsmName: string;
+  projectKmsSsmArn: string
 }
 
 export class servicesStack extends cdk.Stack{
@@ -19,6 +21,7 @@ export class servicesStack extends cdk.Stack{
 
     const projectsTableName = StringParameter.valueForStringParameter(this, props.tableSsmName)
     const projectsTableArn = StringParameter.valueForStringParameter(this, props.arnSsmName)
+    const kmsProjectTableArn = StringParameter.valueForStringParameter(this, props.projectKmsSsmArn);
 
 
     const routingLambda = new lambda.Function(this, 'routingLambda', {
@@ -48,6 +51,9 @@ export class servicesStack extends cdk.Stack{
       }
     ))
 
+    const importedKey = kms.Key.fromKeyArn(this, 'projectKey', kmsProjectTableArn);
+
+    importedKey.grantEncryptDecrypt(routingLambda)
     this.myRoutingLambdaFunction = routingLambda
 
 

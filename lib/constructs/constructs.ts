@@ -1,8 +1,13 @@
 import { StringParameter } from "aws-cdk-lib/aws-ssm";
-import { TableV2, AttributeType } from "aws-cdk-lib/aws-dynamodb";
+import {
+  TableV2,
+  AttributeType,
+  TableEncryptionV2,
+} from "aws-cdk-lib/aws-dynamodb";
 import { DynamoConstruct } from "../interfaces/cdkInterfaces";
 import { Construct } from "constructs";
 import { RemovalPolicy } from "aws-cdk-lib";
+import * as kms from "aws-cdk-lib/aws-kms";
 /**
  * Creates a new DynamoDB table and stores its name and ARN in AWS Systems Manager (SSM) Parameter Store.
  *
@@ -20,34 +25,53 @@ import { RemovalPolicy } from "aws-cdk-lib";
 export class dbTable extends Construct {
   public readonly ssmTableName: string;
   public readonly ssmTableArn: string;
+  public readonly keySsmTable: string;
   public readonly gsiName: string;
 
   constructor(scope: Construct, id: string, props: DynamoConstruct) {
     super(scope, id);
-    const ssmParamName = `/table/${props.name}`;
-    this.buildDynamoTable(props, ssmParamName);
-    this.ssmTableName = `${ssmParamName}-name`;
-    this.ssmTableArn = `${ssmParamName}-arn`;
+    const ssmTableName = `/table/${props.name}`;
+    const keySsm = `/kms/${props.name}`;
+    this.buildDynamoTable(props, ssmTableName, keySsm);
+    this.ssmTableName = `${ssmTableName}-name`;
+    this.ssmTableArn = `${ssmTableName}-arn`;
+    this.keySsmTable = `${keySsm}-arn`;
     this.gsiName = "tableGsi";
   }
 
-  public buildDynamoTable(values: DynamoConstruct, ssmName: string) {
-    const projectsTable = new TableV2(this, `${values.name}`, {
+  public buildDynamoTable(
+    values: DynamoConstruct,
+    tableSsmName: string,
+    ssmKmsName: string
+  ) {
+    const tableKey = new kms.Key(this, `${values.name}-kms`);
+
+    const table = new TableV2(this, `${values.name}`, {
       partitionKey: { name: values.partitionName, type: AttributeType.STRING },
+      ...(values.sortKey && {
+        sortKey: { name: values.sortKey, type: AttributeType.STRING },
+      }),
       removalPolicy: RemovalPolicy.DESTROY,
+      encryption: TableEncryptionV2.customerManagedKey(tableKey),
     });
 
     new StringParameter(this, `${values.name}-ssm-name`, {
-      parameterName: `${ssmName}-name`,
-      stringValue: projectsTable.tableName,
+      parameterName: `${tableSsmName}-name`,
+      stringValue: table.tableName,
     });
 
     new StringParameter(this, `${values.name}-ssm-arn`, {
-      parameterName: `${ssmName}-arn`,
-      stringValue: projectsTable.tableArn,
+      parameterName: `${tableSsmName}-arn`,
+      stringValue: table.tableArn,
     });
+
+    new StringParameter(this, `${values.name}-kms-arn`, {
+      parameterName: `${ssmKmsName}-arn`,
+      stringValue: tableKey.keyArn,
+    });
+
     if (values.gsiPk) {
-      projectsTable.addGlobalSecondaryIndex({
+      table.addGlobalSecondaryIndex({
         indexName: "tableGsi",
         partitionKey: {
           name: values.gsiPk,
