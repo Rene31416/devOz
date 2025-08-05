@@ -20,7 +20,7 @@ import { RemovalPolicy } from "aws-cdk-lib";
 export class dbTable extends Construct {
   public readonly ssmTableName: string;
   public readonly ssmTableArn: string;
-  public readonly gsiName:string;
+  public readonly gsiName: string;
 
   constructor(scope: Construct, id: string, props: DynamoConstruct) {
     super(scope, id);
@@ -28,13 +28,10 @@ export class dbTable extends Construct {
     this.buildDynamoTable(props, ssmParamName);
     this.ssmTableName = `${ssmParamName}-name`;
     this.ssmTableArn = `${ssmParamName}-arn`;
-    this.gsiName = 'tableGsi'
+    this.gsiName = "tableGsi";
   }
 
-  public buildDynamoTable(
-    values: DynamoConstruct,
-    ssmName: string,
-  ) {
+  public buildDynamoTable(values: DynamoConstruct, ssmName: string) {
     const projectsTable = new TableV2(this, `${values.name}`, {
       partitionKey: { name: values.partitionName, type: AttributeType.STRING },
       removalPolicy: RemovalPolicy.DESTROY,
@@ -51,7 +48,7 @@ export class dbTable extends Construct {
     });
     if (values.gsiPk) {
       projectsTable.addGlobalSecondaryIndex({
-        indexName: 'tableGsi',
+        indexName: "tableGsi",
         partitionKey: {
           name: values.gsiPk,
           type: AttributeType.STRING,

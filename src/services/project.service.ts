@@ -8,6 +8,7 @@ import {
   PutCommand,
   ScanCommand,
   UpdateCommand,
+  GetCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { Logger } from "@aws-lambda-powertools/logger";
 import {
@@ -39,10 +40,18 @@ export class Project {
           TableName: this.tableName,
         })
       );
+      const Items = [];
+      for (const project of response.Items ?? []) {
+        Items.push({
+          name: project.name,
+          id: project.id,
+        });
+      }
+
       return {
         statusCode: 200,
         message: ResponseMessage.GeneralSuccess,
-        data: response.Items,
+        data: Items,
       };
     } catch (error: any) {
       this.logger.error("Unexpected Error", { error });
@@ -54,15 +63,18 @@ export class Project {
     try {
       const itemParams = {
         TableName: this.tableName,
-        IndexName: "tableGsi",
-        KeyConditionExpression: "id = :pk",
+        Key: {
+          id,
+        },
+        KeyConditionExpression: "id = :id",
         ExpressionAttributeValues: {
-          ":pk": id,
+          ":id": id,
         },
       };
 
       const response = await this.docClient.send(new QueryCommand(itemParams));
-      if (response.Items?.length === 0) {
+
+      if (!response.Items || response.Items.length === 0) {
         return {
           statusCode: StatusCode.PartialSucess,
           message: ResponseMessage.NoItemsFound,
@@ -72,7 +84,7 @@ export class Project {
       return {
         statusCode: StatusCode.Sucess,
         message: ResponseMessage.GeneralSuccess,
-        data: response.Items || [],
+        data: response.Items[0] || [],
       };
     } catch (error: any) {
       this.logger.error("Unexpected Error", { error });
@@ -82,17 +94,15 @@ export class Project {
 
   public async postProject(body: Record<any, any>): Promise<IApiResponse> {
     try {
+      const id = uuidv4 ()
       const params = {
         TableName: this.tableName,
         Item: {
           ...body,
-          id: uuidv4(),
-        },
-        ConditionExpression: "attribute_not_exists(#name)",
-        ExpressionAttributeNames: {
-          "#name": "name",
+          id
         },
       };
+      console.log(params)
       await this.docClient.send(new PutCommand(params));
 
       return {
@@ -112,7 +122,7 @@ export class Project {
       const params = {
         TableName: this.tableName,
         Key: {
-          name: body.name, // Your partition key
+          id: body.id// Your partition key
         },
         UpdateExpression: "SET #name = :name, #description = :description",
         ExpressionAttributeNames: {
@@ -124,7 +134,7 @@ export class Project {
           ":description": body.description,
         }, // Optional: returns only updated fields
       };
-      console.log(params)
+      console.log(params);
       await this.docClient.send(new UpdateCommand(params));
       return {
         statusCode: 200,
@@ -138,30 +148,14 @@ export class Project {
 
   public async deleteProject(id: string): Promise<IApiResponse> {
     try {
-      //query for ID gsi to find pk (#name)
-      const deleteQueryParams = {
+      const params = {
         TableName: this.tableName,
-        IndexName: "tableGsi",
-        KeyConditionExpression: "id = :pk",
-        ExpressionAttributeValues: {
-          ":pk": id,
+        Key: {
+          id
         },
       };
-      const queryResponse = await this.docClient.send(
-        new QueryCommand(deleteQueryParams)
-      );
-      //delete all record under pk (should be unique)
-      for (const item of queryResponse.Items ?? []) {
-        console.log(item)
-        const pk = item.name; 
-        const params = {
-          TableName: this.tableName,
-          Key: {
-            name: pk,
-          },
-        };
-        await this.docClient.send(new DeleteCommand(params));
-      }
+      console.log(params);
+      await this.docClient.send(new DeleteCommand(params));
 
       return {
         statusCode: 200,

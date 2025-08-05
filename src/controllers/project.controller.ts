@@ -11,7 +11,7 @@ import {
   PUT,
 } from "ts-lambda-api";
 import { plainToInstance } from "class-transformer";
-import { ProjectDTO } from "../dto/projects.dtos";
+import { PostProjectDTO, PutProjectDTO } from "../dto/projects.dtos";
 import { validate } from "class-validator";
 @apiController("/projects") // api/v1/hello-world for every controller define here
 @injectable() // all controller classes must be decorated with injectable
@@ -35,13 +35,13 @@ export class ProjectController extends Controller {
 
   @POST("/create")
   public async post(@body project: Record<string, string>) {
-    await this.ValidateDTO(project, ProjectDTO);
+    await this.ValidateDTO(project, PostProjectDTO);
     return await this.project.postProject(project);
   }
 
   @PUT("/update")
   public async put(@body project: Record<string, string>) {
-    await this.ValidateDTO(project, ProjectDTO);
+    await this.ValidateDTO(project, PutProjectDTO);
     return await this.project.putProject(project);
   }
 
