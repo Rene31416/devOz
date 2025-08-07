@@ -15,12 +15,13 @@ export class dataStack extends Stack {
         name:'devOpz-table',
         partitionName:'id',
       })
-
+ /*
     const useDataTable = new dbTable(this, `${id}-user-data`, {
         name:'devOpz-user-table',
         partitionName:'user',
         sortKey : 'password'
       })
+        */
     this.ssmProjectTableName = projectsTable.ssmTableName
     this.ssmProjectTableArn =projectsTable.ssmTableArn
     this.ssmKProjectsTableKmsArn = projectsTable.keySsmTable
