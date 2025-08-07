@@ -5,6 +5,7 @@ import { Construct } from "constructs";
 import * as path from "path";
 import {StringParameter} from 'aws-cdk-lib/aws-ssm'
 import * as kms from "aws-cdk-lib/aws-kms";
+import { Secret } from "aws-cdk-lib/aws-secretsmanager";
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
 
 interface serviceStackProps extends cdk.StackProps {
@@ -23,7 +24,8 @@ export class servicesStack extends cdk.Stack{
     const projectsTableArn = StringParameter.valueForStringParameter(this, props.arnSsmName)
     const kmsProjectTableArn = StringParameter.valueForStringParameter(this, props.projectKmsSsmArn);
 
-
+    const secret = new Secret(this, 'credentials')
+    
     const routingLambda = new lambda.Function(this, 'routingLambda', {
       runtime: lambda.Runtime.NODEJS_20_X,
       functionName:'dev-opz-routing-lambda',
