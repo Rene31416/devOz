@@ -72,7 +72,17 @@ export class servicesStack extends cdk.Stack{
         ],
       }
     ))
-
+    loginLambda.addToRolePolicy(new PolicyStatement(
+      {
+        actions: [
+          "kms:decrypt",
+          "secretsmanager:GetSecretValue"
+        ],
+        resources: [
+          secret.secretArn
+        ],
+      }
+    ))
     const importedKey = kms.Key.fromKeyArn(this, 'projectKey', kmsProjectTableArn);
 
     importedKey.grantEncryptDecrypt(routingLambda)
