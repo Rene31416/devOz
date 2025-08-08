@@ -9,6 +9,7 @@ export class apiStack extends cdk.Stack {
     scope: Construct,
     id: string,
     serviceRoutingLambda: lambda.Function,
+    loginLambda: lambda.Function,
     props?: cdk.StackProps
   ) {
     super(scope, id, props);
@@ -26,13 +27,27 @@ export class apiStack extends cdk.Stack {
     const response = resourcesBuilder.addResources(globalApi);
 
     // Create a Lambda integration that all API methods will use.
-    const integration = new apigw.LambdaIntegration(serviceRoutingLambda);
+    const routingIntegration = new apigw.LambdaIntegration(
+      serviceRoutingLambda
+    );
+    const loginIntegration = new apigw.LambdaIntegration(loginLambda);
 
     // Store created Method objects so we can explicitly set deployment dependencies.
     const methods: apigw.Method[] = [];
     for (const path of response) {
-      const method = path.resource.addMethod(path.method, integration);
-      methods.push(method);
+      if (path.authentication) {
+        const privateMethod = path.resource.addMethod(
+          path.method,
+          routingIntegration
+        );
+        methods.push(privateMethod);
+      } else {
+        const publicMethod = path.resource.addMethod(
+          path.method,
+          loginIntegration
+        );
+        methods.push(publicMethod);
+      }
     }
 
     // Create a Deployment to capture the current state of all resources/methods.

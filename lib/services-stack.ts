@@ -16,6 +16,8 @@ interface serviceStackProps extends cdk.StackProps {
 
 export class servicesStack extends cdk.Stack{
   public readonly myRoutingLambdaFunction: lambda.Function //exporting this class variable so i can pass it to api stack
+  public readonly myAuthorizerLambda: lambda.Function //exporting this class variable so i can pass it to api stack
+  public readonly myLoginLambda:lambda.Function
 
   constructor(scope: Construct, id: string, props: serviceStackProps) {
     super(scope, id, props);
@@ -36,6 +38,25 @@ export class servicesStack extends cdk.Stack{
       }
     })
 
+    const loginLambda = new lambda.Function(this, 'loginLambda', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      functionName:'dev-opz-login-lambda',
+      handler: 'login.handler',
+      code: lambda.Code.fromAsset(path.join(__dirname, "../dist/")),
+      environment:{
+        TABLE_PROJECTS_NAME: projectsTableName
+      }
+    })
+    const authorizerLambda = new lambda.Function(this, 'authorizerLambda', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      functionName:'dev-opz-authorizer-lambda',
+      handler: 'authorizer.handler',
+      code: lambda.Code.fromAsset(path.join(__dirname, "../dist/")),
+      environment:{
+        TABLE_PROJECTS_NAME: projectsTableName
+      }
+    })
+
     routingLambda.addToRolePolicy(new PolicyStatement(
       {
         actions: [
@@ -47,8 +68,7 @@ export class servicesStack extends cdk.Stack{
           "dynamodb:Query"
         ],
         resources: [
-          projectsTableArn,
-          `${projectsTableArn}/index/tableGsi` //TODO: Use dynamic reference
+          projectsTableArn
         ],
       }
     ))
@@ -57,6 +77,8 @@ export class servicesStack extends cdk.Stack{
 
     importedKey.grantEncryptDecrypt(routingLambda)
     this.myRoutingLambdaFunction = routingLambda
+    this.myAuthorizerLambda = authorizerLambda
+    this.myLoginLambda =loginLambda
 
 
   }

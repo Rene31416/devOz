@@ -14,11 +14,12 @@ const deployDataStack = new dataStack(app, "dataStack", {
 const deployServiceStack = new servicesStack(app, "serviceStack", {
   tableSsmName: deployDataStack.ssmProjectTableName,
   arnSsmName: deployDataStack.ssmProjectTableArn,
-  projectKmsSsmArn: deployDataStack.ssmKProjectsTableKmsArn
+  projectKmsSsmArn: deployDataStack.ssmKProjectsTableKmsArn,
 });
 
-const deplouApiStack = new apiStack(
+new apiStack(
   app,
   "apiStack",
-  deployServiceStack.myRoutingLambdaFunction
+  deployServiceStack.myAuthorizerLambda,
+  deployServiceStack.myLoginLambda
 );

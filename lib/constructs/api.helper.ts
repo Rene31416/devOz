@@ -30,9 +30,26 @@ export class ApiPathBuilder {
       response.push({
         resource: current,
         method: resource.method,
+        authentication:true
       });
     }
+    for (const resource of resources.public) {
+      // Split the path into segments (e.g., "api/v1/projects" → ["api", "v1", "projects"])
+      const segments = resource.path.split("/").filter(Boolean);
 
+      // Start from the API root and create/reuse nested resources for each segment.
+      let current = globalApi.root;
+      for (const segment of segments) {
+        current = current.getResource(segment) ?? current.addResource(segment);
+      }
+
+      // Store the final resource and its HTTP method in the response array.
+      response.push({
+        resource: current,
+        method: resource.method,
+        authentication:false
+      });
+    }
     return response;
   }
 }

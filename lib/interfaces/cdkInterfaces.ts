@@ -11,4 +11,5 @@ export interface DynamoConstruct extends StackProps{
 export interface IResourceObject {
   resource:IResource;
   method: string;
+  authentication: boolean;
 }
