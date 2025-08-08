@@ -4,22 +4,7 @@ import { IResourceObject } from "../interfaces/cdkInterfaces";
 
 export class ApiPathBuilder {
   constructor() {}
-  /*
-  private addPath(
-    api: apigw.IRestApi,
-    path: string,
-    integrationLambda: lambda.Function
-  ): cdk.aws_apigateway.Method {
-    const segments = path.split("/").filter(Boolean);
-    let current = this.root;
 
-    for (const segment of segments) {
-      current = current.addResource(segment);
-    }
-    const integration = new apigw.LambdaIntegration(integrationLambda);
-    return current.addMethod("GET", integration);
-  }
-    */
 
   public addResources(globalApi: apigw.IRestApi): IResourceObject[] {
     const response: IResourceObject[] = [];
