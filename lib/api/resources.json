@@ -1,0 +1,24 @@
+{
+    "private": [{
+        "path":"api/v1/projects/list",
+        "method":"GET"
+    },
+    {
+        "path":"api/v1/projects/{id}",
+        "method":"GET" 
+    },
+    {
+        "path":"api/v1/projects/create",
+        "method":"POST" 
+    },
+    {
+        "path":"api/v1/projects/update",
+        "method":"PUT" 
+    },
+    {
+        "path":"api/v1/projects/{id}",
+        "method":"DELETE" 
+    }],
+    "public":[]
+
+}

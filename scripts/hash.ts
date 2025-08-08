@@ -13,4 +13,5 @@ bcrypt.hash(password, 12).then((hash) => {
   console.log(hash);
 });
 
+
 // npx tsx scripts/hash.ts yourPassword
