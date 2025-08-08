@@ -83,6 +83,8 @@ export class servicesStack extends cdk.Stack{
         ],
       }
     ))
+    
+    secret.grantRead(loginLambda)
     const importedKey = kms.Key.fromKeyArn(this, 'projectKey', kmsProjectTableArn);
 
     importedKey.grantEncryptDecrypt(routingLambda)
