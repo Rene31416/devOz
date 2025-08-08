@@ -11,7 +11,7 @@ import {
   PUT,
 } from "ts-lambda-api";
 import { plainToInstance } from "class-transformer";
-import {LoginDto } from "../dto/login.dtos";
+import { LoginDto } from "../dto/login.dtos";
 import { validate } from "class-validator";
 import { LoginService } from "../services/login.service";
 @apiController()
@@ -27,7 +27,10 @@ export class LoginController extends Controller {
   @POST("/login")
   public async post(@body credentials: Record<string, string>) {
     await this.ValidateDTO(credentials, LoginDto);
-    return await this.loginService.login();
+    return await this.loginService.login({
+      user: credentials.user,
+      password: credentials.password,
+    });
   }
 
   public async ValidateDTO(body: Record<string, string>, bodyDTO: any) {

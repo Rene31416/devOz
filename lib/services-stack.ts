@@ -44,7 +44,7 @@ export class servicesStack extends cdk.Stack{
       handler: 'login.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, "../dist/")),
       environment:{
-        TABLE_PROJECTS_NAME: projectsTableName
+        SECRET_ARN: secret.secretArn
       }
     })
     const authorizerLambda = new lambda.Function(this, 'authorizerLambda', {
@@ -52,9 +52,7 @@ export class servicesStack extends cdk.Stack{
       functionName:'dev-opz-authorizer-lambda',
       handler: 'authorizer.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, "../dist/")),
-      environment:{
-        TABLE_PROJECTS_NAME: projectsTableName
-      }
+
     })
 
     routingLambda.addToRolePolicy(new PolicyStatement(
