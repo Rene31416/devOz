@@ -1,9 +1,8 @@
-import bcrypt from "bcryptjs";
+import argon2 from "argon2";
 import { ICredentials } from "../interfaces/login.interface";
 import {
   SecretsManagerClient,
   GetSecretValueCommand,
-  GetSecretValueCommandOutput,
 } from "@aws-sdk/client-secrets-manager";
 
 import { config } from "process";
@@ -15,8 +14,9 @@ export class LoginService {
     console.log("login");
     const secretName = process.env.SECRET_ID || "";
     const secret = await this.getSecret(secretName);
-    console.log(secret);
+    //console.log(secret);
     console.log("validation");
+    /*
     const validation = await this.validateCredentials(
       {
         user: secret.user,
@@ -24,7 +24,9 @@ export class LoginService {
       },
       body
     );
-    console.log("after all");
+    */
+    const validation = await argon2.verify(secret.password, body.password);
+
     return {
       message: "vlidation process",
       decission: validation,
@@ -39,10 +41,10 @@ export class LoginService {
     };
     const command = new GetSecretValueCommand(input);
     const secretValue = (await client.send(command)).SecretString || "";
-    console.log(secretValue)
+    //console.log(secretValue)
     return JSON.parse(secretValue);
   }
-
+/*
   private async validateCredentials(
     secret: ICredentials,
     credentials: ICredentials
@@ -77,4 +79,5 @@ export class LoginService {
       return false; // treat error as failed login
     }
   }
+    */
 }
