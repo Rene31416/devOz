@@ -1,14 +1,17 @@
-import * as path from "path"
-import { loginContainer } from "./containers/login.container"
-import { AppConfig, ApiLambdaApp } from "ts-lambda-api"
+import * as path from "path";
+import { loginContainer } from "./containers/login.container";
+import { AppConfig, ApiLambdaApp } from "ts-lambda-api";
 
-const appConfig = new AppConfig()
+const appConfig = new AppConfig();
 
+const controllersPath = [path.join(__dirname, "controllers")];
 
-const controllersPath = [path.join(__dirname, "controllers")]
+const app = new ApiLambdaApp(controllersPath, appConfig, loginContainer);
 
-const app = new ApiLambdaApp(controllersPath, appConfig, loginContainer)
+export async function handler(event: any, context: any) {
+  console.log("here");
 
-export async function handler(event:any, context:any) {
-    return await app.run(event, context)
+  const response = await app.run(event, context);
+  console.log('after')
+  return response;
 }

@@ -25,7 +25,6 @@ export class servicesStack extends cdk.Stack{
     const projectsTableName = StringParameter.valueForStringParameter(this, props.tableSsmName)
     const projectsTableArn = StringParameter.valueForStringParameter(this, props.arnSsmName)
     const kmsProjectTableArn = StringParameter.valueForStringParameter(this, props.projectKmsSsmArn);
-
     const secret = new Secret(this, 'credentials')
     
     const routingLambda = new lambda.Function(this, 'routingLambda', {
@@ -44,7 +43,7 @@ export class servicesStack extends cdk.Stack{
       handler: 'login.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, "../dist/")),
       environment:{
-        SECRET_ARN: secret.secretArn
+        SECRET_ID: secret.secretName,
       }
     })
     const authorizerLambda = new lambda.Function(this, 'authorizerLambda', {

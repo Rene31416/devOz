@@ -24,14 +24,22 @@ export class LoginController extends Controller {
     super();
   }
 
-  @POST("/login")
-  public async post(@body credentials: Record<string, string>) {
+@POST("/login")
+public async post(@body credentials: Record<string, string>) {
+  try {
     await this.ValidateDTO(credentials, LoginDto);
-    return await this.loginService.login({
+    console.log('controller')
+    const result = await this.loginService.login({
       user: credentials.user,
       password: credentials.password,
     });
+    console.log("Login successful result:", result);
+    return result;
+  } catch (error) {
+    console.error("LoginController /login error:", error);
+    throw error;
   }
+}
 
   public async ValidateDTO(body: Record<string, string>, bodyDTO: any) {
     try {

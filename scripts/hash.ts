@@ -1,5 +1,5 @@
 #!/usr/bin/env tsx
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 
 const password = process.argv[2];
 
