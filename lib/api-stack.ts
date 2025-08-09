@@ -3,6 +3,7 @@ import { Construct } from "constructs";
 import * as apigw from "aws-cdk-lib/aws-apigateway";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import { ApiPathBuilder } from "./constructs/api.helper";
+import * as cognito from "aws-cdk-lib/aws-cognito";
 
 export class apiStack extends cdk.Stack {
   constructor(
@@ -14,12 +15,39 @@ export class apiStack extends cdk.Stack {
   ) {
     super(scope, id, props);
 
+    const userPool = new cognito.UserPool(this, "AdminUserPool", {
+      selfSignUpEnabled: false, // disable public registration
+      signInAliases: { username: true },
+      passwordPolicy: {
+        minLength: 8,
+        requireDigits: true,
+        requireLowercase: true,
+        requireUppercase: true,
+        requireSymbols: false,
+      },
+    });
+
+      const userPoolClient = new cognito.UserPoolClient(this, "AdminUserPoolClient", {
+      userPool,
+      generateSecret: false, // for public/native apps
+      authFlows: {
+        adminUserPassword: true, // allow admin to auth with username/password
+        userPassword: true,
+      },
+    });
+
+
     // Create the API Gateway REST API without automatic deployment.
     // This allows full manual control over when deployments occur.
     const globalApi = new apigw.RestApi(this, "dev-opz-globalApi", {
       restApiName: "globalApi",
       deploy: false,
     });
+
+    const authorizer = new apigw.CognitoUserPoolsAuthorizer(this, "CognitoAuthorizer", {
+      cognitoUserPools: [userPool],
+    });
+
 
     // Build all API Gateway resources from a predefined configuration file
     // using the ApiPathBuilder helper. Returns an array of resource/method pairs.
@@ -30,7 +58,6 @@ export class apiStack extends cdk.Stack {
     const routingIntegration = new apigw.LambdaIntegration(
       serviceRoutingLambda
     );
-    const loginIntegration = new apigw.LambdaIntegration(loginLambda);
 
     // Store created Method objects so we can explicitly set deployment dependencies.
     const methods: apigw.Method[] = [];
@@ -38,15 +65,13 @@ export class apiStack extends cdk.Stack {
       if (path.authentication) {
         const privateMethod = path.resource.addMethod(
           path.method,
-          routingIntegration
+          routingIntegration,
+          {
+            authorizer,
+            authorizationType:apigw.AuthorizationType.COGNITO
+          }
         );
         methods.push(privateMethod);
-      } else {
-        const publicMethod = path.resource.addMethod(
-          path.method,
-          loginIntegration
-        );
-        methods.push(publicMethod);
       }
     }
 
@@ -67,6 +92,10 @@ export class apiStack extends cdk.Stack {
       stageName: "prod",
       deployment,
     });
+
+      new cdk.CfnOutput(this, "UserPoolId", { value: userPool.userPoolId });
+      new cdk.CfnOutput(this, "UserPoolClientId", { value: userPoolClient.userPoolClientId });
+  
 
     // TODO: Consider moving the API resource definitions to a separate stack.
     // This would allow removing/redeploying resources without replacing the entire API stack,

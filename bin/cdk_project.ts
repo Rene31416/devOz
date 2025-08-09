@@ -20,6 +20,6 @@ const deployServiceStack = new servicesStack(app, "serviceStack", {
 new apiStack(
   app,
   "apiStack",
-  deployServiceStack.myAuthorizerLambda,
+  deployServiceStack.myRoutingLambdaFunction,
   deployServiceStack.myLoginLambda
 );
