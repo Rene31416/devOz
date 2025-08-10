@@ -96,7 +96,6 @@ export class apiStack extends cdk.Stack {
       new cdk.CfnOutput(this, "UserPoolId", { value: userPool.userPoolId });
       new cdk.CfnOutput(this, "UserPoolClientId", { value: userPoolClient.userPoolClientId });
   
-
     // TODO: Consider moving the API resource definitions to a separate stack.
     // This would allow removing/redeploying resources without replacing the entire API stack,
     // which is useful when frequently updating endpoint definitions.
