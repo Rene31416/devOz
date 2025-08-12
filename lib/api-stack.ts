@@ -27,27 +27,38 @@ export class apiStack extends cdk.Stack {
       },
     });
 
-      const userPoolClient = new cognito.UserPoolClient(this, "AdminUserPoolClient", {
-      userPool,
-      generateSecret: false, // for public/native apps
-      authFlows: {
-        adminUserPassword: true, // allow admin to auth with username/password
-        userPassword: true,
-      },
-    });
-
+    const userPoolClient = new cognito.UserPoolClient(
+      this,
+      "AdminUserPoolClient",
+      {
+        userPool,
+        generateSecret: false, // for public/native apps
+        authFlows: {
+          adminUserPassword: true, // allow admin to auth with username/password
+          userPassword: true,
+        },
+      }
+    );
 
     // Create the API Gateway REST API without automatic deployment.
     // This allows full manual control over when deployments occur.
     const globalApi = new apigw.RestApi(this, "dev-opz-globalApi", {
       restApiName: "globalApi",
       deploy: false,
+      defaultCorsPreflightOptions: {
+        allowOrigins: apigw.Cors.ALL_ORIGINS, // Or specify specific origins like ['https://example.com']
+        allowMethods: apigw.Cors.ALL_METHODS, // Or specify specific methods like ['GET', 'POST']
+        allowHeaders: apigw.Cors.DEFAULT_HEADERS,
+      },
     });
 
-    const authorizer = new apigw.CognitoUserPoolsAuthorizer(this, "CognitoAuthorizer", {
-      cognitoUserPools: [userPool],
-    });
-
+    const authorizer = new apigw.CognitoUserPoolsAuthorizer(
+      this,
+      "CognitoAuthorizer",
+      {
+        cognitoUserPools: [userPool],
+      }
+    );
 
     // Build all API Gateway resources from a predefined configuration file
     // using the ApiPathBuilder helper. Returns an array of resource/method pairs.
@@ -68,7 +79,7 @@ export class apiStack extends cdk.Stack {
           routingIntegration,
           {
             authorizer,
-            authorizationType:apigw.AuthorizationType.COGNITO
+            authorizationType: apigw.AuthorizationType.COGNITO,
           }
         );
         methods.push(privateMethod);
@@ -93,9 +104,11 @@ export class apiStack extends cdk.Stack {
       deployment,
     });
 
-      new cdk.CfnOutput(this, "UserPoolId", { value: userPool.userPoolId });
-      new cdk.CfnOutput(this, "UserPoolClientId", { value: userPoolClient.userPoolClientId });
-  
+    new cdk.CfnOutput(this, "UserPoolId", { value: userPool.userPoolId });
+    new cdk.CfnOutput(this, "UserPoolClientId", {
+      value: userPoolClient.userPoolClientId,
+    });
+
     // TODO: Consider moving the API resource definitions to a separate stack.
     // This would allow removing/redeploying resources without replacing the entire API stack,
     // which is useful when frequently updating endpoint definitions.
