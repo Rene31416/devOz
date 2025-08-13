@@ -44,6 +44,12 @@ export class apiStack extends cdk.Stack {
     const globalApi = new apigw.RestApi(this, "dev-opz-globalApi", {
       restApiName: "globalApi",
       deploy: false,
+      defaultCorsPreflightOptions: {
+        allowOrigins: apigw.Cors.ALL_ORIGINS, // Or specify specific origins like ['https://example.com']
+        allowMethods: apigw.Cors.ALL_METHODS, // Or specify specific methods like ['GET', 'POST']
+        allowHeaders: apigw.Cors.DEFAULT_HEADERS,
+        allowCredentials:true
+      },
     });
 
     const authorizer = new apigw.CognitoUserPoolsAuthorizer(
