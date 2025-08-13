@@ -21,5 +21,4 @@ new apiStack(
   app,
   "apiStack",
   deployServiceStack.myRoutingLambdaFunction,
-  deployServiceStack.myLoginLambda
 );

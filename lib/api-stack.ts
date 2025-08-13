@@ -10,7 +10,6 @@ export class apiStack extends cdk.Stack {
     scope: Construct,
     id: string,
     serviceRoutingLambda: lambda.Function,
-    loginLambda: lambda.Function,
     props?: cdk.StackProps
   ) {
     super(scope, id, props);

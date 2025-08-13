@@ -37,23 +37,6 @@ export class servicesStack extends cdk.Stack{
       }
     })
 
-    const loginLambda = new lambda.Function(this, 'loginLambda', {
-      runtime: lambda.Runtime.NODEJS_20_X,
-      functionName:'dev-opz-login-lambda',
-      handler: 'login.handler',
-      code: lambda.Code.fromAsset(path.join(__dirname, "../dist/")),
-      environment:{
-        SECRET_ID: secret.secretName,
-      }
-    })
-    const authorizerLambda = new lambda.Function(this, 'authorizerLambda', {
-      runtime: lambda.Runtime.NODEJS_20_X,
-      functionName:'dev-opz-authorizer-lambda',
-      handler: 'authorizer.handler',
-      code: lambda.Code.fromAsset(path.join(__dirname, "../dist/")),
-
-    })
-
     routingLambda.addToRolePolicy(new PolicyStatement(
       {
         actions: [
@@ -69,25 +52,12 @@ export class servicesStack extends cdk.Stack{
         ],
       }
     ))
-    loginLambda.addToRolePolicy(new PolicyStatement(
-      {
-        actions: [
-          "kms:decrypt",
-          "secretsmanager:GetSecretValue"
-        ],
-        resources: [
-          secret.secretArn
-        ],
-      }
-    ))
+
     
-    secret.grantRead(loginLambda)
     const importedKey = kms.Key.fromKeyArn(this, 'projectKey', kmsProjectTableArn);
 
     importedKey.grantEncryptDecrypt(routingLambda)
     this.myRoutingLambdaFunction = routingLambda
-    this.myAuthorizerLambda = authorizerLambda
-    this.myLoginLambda =loginLambda
 
 
   }
