@@ -46,6 +46,3 @@ aws cognito-idp admin-set-user-password \
 
 
 ---
-
-If you want, I can also tailor the README so it describes your **multi-tenant WhatsApp AI SaaS infra** rather than a generic CDK project — that way, it will be aligned with your long-term goal, not just the current codebase.  
-Do you want me to make it **specific to your SaaS infrastructure vision**? That would make it way more impressive for a public repo. ​:contentReference[oaicite:0]{index=0}​
