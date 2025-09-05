@@ -60,34 +60,6 @@ export class AuthStack extends cdk.Stack {
       }
     );
 
-    // Build all API Gateway resources from a predefined configuration file
-    // using the ApiPathBuilder helper. Returns an array of resource/method pairs.
-    const resourcesBuilder = new ApiPathBuilder();
-    const response = resourcesBuilder.addResources(globalApi);
-
-    // Create a Lambda integration that all API methods will use.
-    const routingIntegration = new apigw.LambdaIntegration(
-      serviceRoutingLambda
-    );
-
-    // Store created Method objects so we can explicitly set deployment dependencies.
-    const methods: apigw.Method[] = [];
-    for (const path of response) {
-      if (path.authentication) {
-        const privateMethod = path.resource.addMethod(
-          path.method,
-          routingIntegration,
-          {
-            authorizer,
-            authorizationType: apigw.AuthorizationType.COGNITO,
-          },
-        );
-        methods.push(privateMethod);
-      }
-    }
-
-    // Create a Deployment to capture the current state of all resources/methods.
-    // A new deployment must be created for API Gateway to serve updated endpoints.
 
   }
 }
