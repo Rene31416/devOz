@@ -88,29 +88,6 @@ export class AuthStack extends cdk.Stack {
 
     // Create a Deployment to capture the current state of all resources/methods.
     // A new deployment must be created for API Gateway to serve updated endpoints.
-    const deployment = new apigw.Deployment(this, "ManualDeployment", {
-      api: globalApi,
-    });
 
-    // Ensure the deployment occurs only after all methods have been created.
-    for (const MyMethod of methods) {
-      deployment.node.addDependency(MyMethod);
-    }
-
-    // Create the "prod" stage that points to this deployment.
-    // The stage represents the environment and base path for the API.
-    new apigw.Stage(this, "private stage", {
-      stageName: "prod",
-      deployment,
-    });
-
-    new cdk.CfnOutput(this, "UserPoolId", { value: userPool.userPoolId });
-    new cdk.CfnOutput(this, "UserPoolClientId", {
-      value: userPoolClient.userPoolClientId,
-    });
-
-    // TODO: Consider moving the API resource definitions to a separate stack.
-    // This would allow removing/redeploying resources without replacing the entire API stack,
-    // which is useful when frequently updating endpoint definitions.
   }
 }
