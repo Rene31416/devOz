@@ -1,5 +1,5 @@
-import { inject, injectable } from "inversify";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { inject, injectable } from "inversify";
 import { v4 as uuidv4 } from "uuid";
 import {
   DeleteCommand,

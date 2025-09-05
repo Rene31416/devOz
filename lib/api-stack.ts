@@ -80,7 +80,7 @@ export class apiStack extends cdk.Stack {
           {
             authorizer,
             authorizationType: apigw.AuthorizationType.COGNITO,
-          }
+          },
         );
         methods.push(privateMethod);
       }
