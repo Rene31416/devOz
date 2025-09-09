@@ -1,14 +1,9 @@
 import { inject, injectable } from "inversify";
-import { Project } from "../services/project.service";
 import {
   apiController,
   body,
   Controller,
-  DELETE,
-  GET,
-  pathParam,
   POST,
-  PUT,
 } from "ts-lambda-api";
 import { plainToInstance } from "class-transformer";
 import { LoginDto } from "../dto/login.dtos";
