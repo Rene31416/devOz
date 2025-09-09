@@ -1,15 +1,12 @@
 import * as cdk from "aws-cdk-lib";
 import { Construct } from "constructs";
 import * as apigw from "aws-cdk-lib/aws-apigateway";
-import * as lambda from "aws-cdk-lib/aws-lambda";
-import { ApiPathBuilder } from "./constructs/api.helper";
 import * as cognito from "aws-cdk-lib/aws-cognito";
 
 export class AuthStack extends cdk.Stack {
   constructor(
     scope: Construct,
     id: string,
-    serviceRoutingLambda: lambda.Function,
     props?: cdk.StackProps
   ) {
     super(scope, id, props);
@@ -39,8 +36,6 @@ export class AuthStack extends cdk.Stack {
       }
     );
 
-    // Create the API Gateway REST API without automatic deployment.
-    // This allows full manual control over when deployments occur.
     const globalApi = new apigw.RestApi(this, "dev-opz-globalApi", {
       restApiName: "globalApi",
       deploy: false,
